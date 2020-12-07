@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:note_app_goto/screens/note_details.dart';
 import 'package:note_app_goto/screens/note_list.dart';
 
 
@@ -16,7 +17,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue
       ),
-      home: NoteList(),
+      home: NoteDetail(),
     );
   }
 }
