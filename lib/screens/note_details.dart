@@ -1,16 +1,28 @@
 import 'package:flutter/material.dart';
 
 class NoteDetail extends StatefulWidget {
+
+  // Note : WillPopScope will allow you to control the back button of your user device
+
+
+  // used in changing the appBar dynamically;
+  String appBarTitle;
+
+  NoteDetail(this.appBarTitle);
+
   @override
-  _NoteDetailState createState() => _NoteDetailState();
+  _NoteDetailState createState() => _NoteDetailState(this.appBarTitle);
 }
 
 class _NoteDetailState extends State<NoteDetail> {
 
+  String appBarTitle;
   static var _priorities = ['High', 'Normal', 'Low'];
   // used to control what the user enter into the text field
 
   var _currentItemSelected = '';
+
+  _NoteDetailState(this.appBarTitle);
 
   @override
   void initState() {
@@ -27,9 +39,22 @@ class _NoteDetailState extends State<NoteDetail> {
   Widget build(BuildContext context) {
 
     TextStyle textStyle = Theme.of(context).textTheme.title;
-    return Scaffold(
+    return WillPopScope (
+      // define what will happen when the user click on the back button
+      onWillPop: () {
+        // control the back navigation on your user device
+        moveToLastScreen();
+      },
+        child : Scaffold(
       appBar: AppBar(
-        title: Text('Edit Note'),
+        title: Text(appBarTitle),
+        leading: IconButton(icon: Icon(
+          Icons.arrow_back),
+          onPressed: () {
+            // control the back navigation on your user device
+            moveToLastScreen();
+          },
+        ),
       ),
       body: Padding(
         padding: EdgeInsets.only(top: 15.0, right: 10.0, left: 10.0),
@@ -138,6 +163,10 @@ class _NoteDetailState extends State<NoteDetail> {
         ),
       ),
 
-    );
+    ));
+  }
+
+  void moveToLastScreen () {
+    Navigator.pop(context);
   }
 }
