@@ -148,6 +148,7 @@ class _NoteDetailState extends State<NoteDetail> {
                         // do something here
                         setState(() {
                           debugPrint('Great');
+                          _save();
                         });
                       },
                     ),
@@ -167,6 +168,7 @@ class _NoteDetailState extends State<NoteDetail> {
                       onPressed: () {
                         // do something here
                         debugPrint('Cancel');
+                        _delete();
                       },
                     ),
                   ),
@@ -181,7 +183,7 @@ class _NoteDetailState extends State<NoteDetail> {
   }
 
   void moveToLastScreen () {
-    Navigator.pop(context);
+    Navigator.pop(context, true);
   }
 
   // convert the string priority to integer before saving in to the database
@@ -230,5 +232,58 @@ class _NoteDetailState extends State<NoteDetail> {
   // function to save data to database
   void _save () async {
 
+    // navigate back to last screen
+    moveToLastScreen();
+
+    // update the date the user insert or update the note
+    note.date = DateFormat.yMMMd().format(DateTime.now());
+    int result;
+    if (note.id == null) {  // update the database
+      result = await helper.updateNote(note);
+    } else { // insert to database
+      result = await helper.insertNote(note);
+    }
+
+    // check if result is a success or a failure
+    if (result != 0) {  // success
+      _showAlertDialog ('Status', 'Note Saved Successfully');
+    } else { // failure
+      _showAlertDialog ('Status', 'Problem Saving Note');
+    }
   }
+
+  void _delete () async {
+
+    moveToLastScreen();
+    // case 1 : if the user want to delete a newly added note through pressing the FAB
+    if (note.id == null) {
+      _showAlertDialog('Status', 'No note was deleted');
+    }
+    // case 2 : user is trying to delete the old note that already has a valid id
+
+    int result = await helper.deleteNote(note.id);
+
+    // check if the note was deleted successfully
+    if (result != 0) {
+      _showAlertDialog('Status', 'Note deleted successfully');
+    } else {
+      _showAlertDialog('Status', 'Error occured while deleting note ');
+    }
+
+  }
+
+  // function to display alert dialog
+  void _showAlertDialog (String title, String description) {
+
+    AlertDialog alertDialog = AlertDialog(
+      title: Text(title),
+      content: Text(description),
+    );
+    showDialog(
+      context: context,
+      builder: (_) => alertDialog
+    );
+  }
+
+
 }

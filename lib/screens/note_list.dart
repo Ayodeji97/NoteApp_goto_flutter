@@ -135,10 +135,14 @@ class _NoteListState extends State<NoteList> {
       Scaffold.of(context).showSnackBar(snackBar);
   }
 
-  void navigateToDetailScreen (Note note, String title) {
-    Navigator.push(context, MaterialPageRoute(builder : (context) {
+  void navigateToDetailScreen (Note note, String title) async {
+    bool result = await Navigator.push(context, MaterialPageRoute(builder : (context) {
       return NoteDetail(note, title);
     }));
+
+    if (result == true) {
+      updateListView();
+    }
   }
 
   void updateListView() {
@@ -157,5 +161,4 @@ class _NoteListState extends State<NoteList> {
 
     });
   }
-
 }
