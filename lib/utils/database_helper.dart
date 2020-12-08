@@ -116,4 +116,22 @@ class DatabaseHelper {
 
   }
 
+  // helper function to convert note map object to note object
+
+  Future<List<Note>> getNoteList () async {
+
+      var noteMapList = await getNoteMapList();   // get map list from database
+
+      int count = noteMapList.length;
+
+      List<Note> noteList = List<Note>();
+
+      // for loop to create note list from map list
+    for (int i = 0; i < count; i++) {
+      noteList.add(Note.fromMapObject(noteMapList[i]));
+    }
+
+    return noteList;
+  }
+
 }

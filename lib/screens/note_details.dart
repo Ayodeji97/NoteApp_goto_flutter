@@ -1,34 +1,42 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
+import 'package:note_app_goto/models/note.dart';
+import 'package:note_app_goto/utils/database_helper.dart';
+import 'package:intl/intl.dart';
 
 class NoteDetail extends StatefulWidget {
 
+
+
   // Note : WillPopScope will allow you to control the back button of your user device
-
-
   // used in changing the appBar dynamically;
-  String appBarTitle;
+  final String appBarTitle;
+  final Note note;
 
-  NoteDetail(this.appBarTitle);
+  NoteDetail(this.note, this.appBarTitle);
 
   @override
-  _NoteDetailState createState() => _NoteDetailState(this.appBarTitle);
+  _NoteDetailState createState() => _NoteDetailState(this.note, this.appBarTitle);
 }
 
 class _NoteDetailState extends State<NoteDetail> {
 
+
+
   String appBarTitle;
-  static var _priorities = ['High', 'Normal', 'Low'];
+  Note note;
+
+  static var _priorities = ['High', 'Medium', 'Low'];
   // used to control what the user enter into the text field
 
-  var _currentItemSelected = '';
+  // database instance
+  DatabaseHelper helper = DatabaseHelper();
 
-  _NoteDetailState(this.appBarTitle);
 
-  @override
-  void initState() {
-    super.initState();
-    _currentItemSelected = _priorities[0];
-  }
+
+  _NoteDetailState(this.note, this.appBarTitle);
+
+
 
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
@@ -37,6 +45,10 @@ class _NoteDetailState extends State<NoteDetail> {
 
   @override
   Widget build(BuildContext context) {
+    // assign note passed from list screen to the form
+    titleController.text = note.title;
+    descriptionController.text = note.description;
+
 
     TextStyle textStyle = Theme.of(context).textTheme.title;
     return WillPopScope (
@@ -68,10 +80,12 @@ class _NoteDetailState extends State<NoteDetail> {
                     child: Text(value),
                 )).toList(),
                 style: textStyle,
-                value: _currentItemSelected,
+                value: getPriorityAsString(note.priority),
                 onChanged: (valueSelectedByUser) {
                   setState(() {
                     debugPrint('User Selected $valueSelectedByUser');
+                    // convert what the user to int value which is compatible with our database
+                    updatePriorityAsInt(valueSelectedByUser);
                   });
                 },
               ),
@@ -84,7 +98,8 @@ class _NoteDetailState extends State<NoteDetail> {
                 controller: titleController,
                 style: textStyle,
                 onChanged: (value) {
-                  debugPrint('Something something I love doing...');
+                  debugPrint('title...');
+                  updateTitle();
                 },
                 decoration: InputDecoration(
                   labelText: 'Title',
@@ -104,6 +119,7 @@ class _NoteDetailState extends State<NoteDetail> {
                 style: textStyle,
                 onChanged: (value) {
                   debugPrint('Description...');
+                  updateDescription();
                 },
                 decoration: InputDecoration(
                     labelText: 'Description',
@@ -166,5 +182,53 @@ class _NoteDetailState extends State<NoteDetail> {
 
   void moveToLastScreen () {
     Navigator.pop(context);
+  }
+
+  // convert the string priority to integer before saving in to the database
+  void updatePriorityAsInt (String priority) {
+    switch(priority) {
+      case 'High' :
+        note.priority = 1;
+        break;
+      case 'Medium' :
+        note.priority = 2;
+        break;
+      case 'Low' :
+        note.priority = 3;
+        break;
+    }
+  }
+
+  // convert the int priority to the string priority and display to the user in dropdown
+  String getPriorityAsString (int value) {
+    String priority;
+    switch(value) {
+      case 1 :
+        priority = _priorities[0];
+        break;
+      case 2 :
+        priority = _priorities[1];
+        break;
+      case 3 :
+        priority = _priorities[2];
+        break;
+    }
+
+    return priority;
+
+  }
+
+  // Helper function to update the title and the description object to the user inputted
+  void updateTitle () {
+    note.title = titleController.text;
+  }
+
+  void updateDescription () {
+    note.description = descriptionController.text;
+  }
+
+  // function to save data to database
+  void _save () async {
+
   }
 }

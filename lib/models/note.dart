@@ -67,7 +67,7 @@ class Note {
   }
 
   // A function that will convert a map object back to a note object : This is a named constructor..check out dart series
-  Note.FromMapObject (Map<String, dynamic> map) {
+  Note.fromMapObject (Map<String, dynamic> map) {
     this._id = map['id'];
     this._title = map['title'];
     this._description = map['description'];
